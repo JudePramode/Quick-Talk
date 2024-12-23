@@ -6,4 +6,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QTViewModel @Inject constructor() : ViewModel() {
+
+
+
+
+
+
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "42556633709",
+    "project_id": "quick-talk-587ff",
+    "storage_bucket": "quick-talk-587ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42556633709:android:ba580ae95fbd058e2d4564",
+        "android_client_info": {
+          "package_name": "com.example.quicktalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM5HBOX1Yib4fddhA9BDC5XouwmzKqIcw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
