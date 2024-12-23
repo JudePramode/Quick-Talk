@@ -18,6 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -42,6 +43,8 @@ android {
     }
     composeOptions{
         kotlinCompilerExtensionVersion = "1.5.15"
+
+
     }
 }
 
