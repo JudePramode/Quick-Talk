@@ -126,7 +126,14 @@ fun SignUpScreen(navController: NavController, vm: QTViewModel) {
                 shape = RoundedCornerShape(12.dp),
             )
 
-            Button(onClick = { },
+            Button(onClick = {vm.signUp(
+                nameState.value.text,
+                numberState.value.text,
+                emailState.value.text,
+                passwordState.value.text,
+            )
+
+            },
                 modifier = Modifier.padding(top = 40.dp).padding(8.dp).widthIn(250.dp,300.dp).heightIn(50.dp,60.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF730101), // Background color
