@@ -2,16 +2,19 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
+
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.example.quicktalk"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.quicktalk"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -37,6 +40,9 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions{
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
 }
 
 dependencies {
@@ -56,4 +62,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation ("com.google.dagger:hilt-android:2.53.1")
+    ksp ("com.google.dagger:hilt-compiler:2.53.1")
+
+    // For instrumentation tests
+    androidTestImplementation  ("com.google.dagger:hilt-android-testing:2.53.1")
+    kspAndroidTest ("com.google.dagger:hilt-compiler:2.53.1")
+
+    // For local unit tests
+    testImplementation ("com.google.dagger:hilt-android-testing:2.53.1")
+    kspTest ("com.google.dagger:hilt-compiler:2.53.1")
 }
