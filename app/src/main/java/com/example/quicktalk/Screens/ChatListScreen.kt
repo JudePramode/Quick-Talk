@@ -8,4 +8,5 @@ import com.example.quicktalk.QTViewModel
 @Composable
 fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
     Text(text="chat List Screen")
+    BottomNavigationMenu(selectedItem = BottomNavigationItem.CHATLIST, navController=navController)
 }

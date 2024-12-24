@@ -73,11 +73,11 @@ class MainActivity : ComponentActivity() {
             }
 
             composable(DestinationScreen.StatusList.route) {
-                StatusScreen()
+                StatusScreen(navController, viewModel)
             }
 
             composable(DestinationScreen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(navController, viewModel)
             }
         }
     }
