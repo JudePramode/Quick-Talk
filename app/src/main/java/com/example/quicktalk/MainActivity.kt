@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.quicktalk.Screens.ChatListScreen
 import com.example.quicktalk.Screens.LoginScreen
 import com.example.quicktalk.Screens.SignUpScreen
 import com.example.quicktalk.ui.theme.QuickTalkTheme
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
             }
             composable(DestinationScreen.Login.route) {
                 LoginScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.ChatList.route) {
+                ChatListScreen(navController, viewModel)
             }
         }
     }

@@ -34,14 +34,19 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.quicktalk.CheckSignedIn
 import com.example.quicktalk.DestinationScreen
 import com.example.quicktalk.QTViewModel
 import com.example.quicktalk.R
+import com.example.quicktalk.commonProgressBar
 import com.example.quicktalk.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController, vm: QTViewModel) {
+
+
+    CheckSignedIn(vm=vm, navController=navController)
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -164,4 +169,9 @@ fun SignUpScreen(navController: NavController, vm: QTViewModel) {
 
         }
     }
+
+    if(vm.inProgress.value){
+        commonProgressBar()
+    }
+
 }
