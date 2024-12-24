@@ -15,7 +15,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.quicktalk.Screens.ChatListScreen
 import com.example.quicktalk.Screens.LoginScreen
+import com.example.quicktalk.Screens.ProfileScreen
 import com.example.quicktalk.Screens.SignUpScreen
+import com.example.quicktalk.Screens.StatusScreen
 import com.example.quicktalk.ui.theme.QuickTalkTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -64,10 +66,18 @@ class MainActivity : ComponentActivity() {
                 SignUpScreen(navController, viewModel)
             }
             composable(DestinationScreen.Login.route) {
-                LoginScreen(navController, viewModel)
+                LoginScreen(navController=navController, vm=viewModel)
             }
             composable(DestinationScreen.ChatList.route) {
                 ChatListScreen(navController, viewModel)
+            }
+
+            composable(DestinationScreen.StatusList.route) {
+                StatusScreen()
+            }
+
+            composable(DestinationScreen.Profile.route) {
+                ProfileScreen()
             }
         }
     }

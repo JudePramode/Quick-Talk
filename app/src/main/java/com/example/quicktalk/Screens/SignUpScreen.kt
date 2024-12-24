@@ -43,7 +43,9 @@ import com.example.quicktalk.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavController, vm: QTViewModel) {
+fun SignUpScreen(navController: NavController, vm: QTViewModel)
+
+{
 
 
     CheckSignedIn(vm=vm, navController=navController)
@@ -132,10 +134,10 @@ fun SignUpScreen(navController: NavController, vm: QTViewModel) {
             )
 
             Button(onClick = {vm.signUp(
-                nameState.value.text,
-                numberState.value.text,
-                emailState.value.text,
-                passwordState.value.text,
+                name = nameState.value.text,
+               number =  numberState.value.text,
+                email = emailState.value.text,
+                password = passwordState.value.text,
             )
 
             },
@@ -168,6 +170,9 @@ fun SignUpScreen(navController: NavController, vm: QTViewModel) {
 
 
         }
+
+
+
     }
 
     if(vm.inProgress.value){

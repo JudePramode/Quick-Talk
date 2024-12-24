@@ -36,8 +36,11 @@ fun CheckSignedIn(vm: QTViewModel, navController: NavController){
     val signIn = vm.signIn.value
 
     if (signIn && !alreadySignIn.value){
-        alreadySignIn = true
+        alreadySignIn.value = true
         navController.navigate(DestinationScreen.ChatList.route)
+        {
+            popUpTo(0)
+        }
     }
 
 
