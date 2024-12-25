@@ -38,7 +38,7 @@ import com.example.quicktalk.CheckSignedIn
 import com.example.quicktalk.DestinationScreen
 import com.example.quicktalk.QTViewModel
 import com.example.quicktalk.R
-import com.example.quicktalk.commonProgressBar
+import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,7 +176,7 @@ fun SignUpScreen(navController: NavController, vm: QTViewModel)
     }
 
     if(vm.inProgress.value){
-        commonProgressBar()
+        CommonProgressBar()
     }
 
 }

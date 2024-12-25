@@ -1,6 +1,7 @@
 package com.example.quicktalk
 
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -15,14 +16,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import javax.inject.Inject
 
 
 @HiltViewModel
 class QTViewModel @Inject constructor(
     val auth: FirebaseAuth,
-    var db: FirebaseFirestore
+    var db: FirebaseFirestore,
+    val storage: FirebaseStorage
 ) : ViewModel() {
 
     var inProgress = mutableStateOf(false)
@@ -88,6 +92,35 @@ class QTViewModel @Inject constructor(
             }
     }
 
+    fun uploadProfileImage(uri: Uri) {
+        inProgress.value = true // Indicate progress in the UI
+
+        uploadImage(uri) { downloadUri ->
+            createOrUpdateProfile(imageurl = downloadUri.toString())
+            inProgress.value = false // Reset progress state
+        }
+    }
+
+
+    fun uploadImage(uri: Uri, onSuccess:(Uri)->Unit){
+        inProgress.value=true
+        val storageRef = storage.reference
+        val uuid= UUID.randomUUID()
+        val imageRef = storageRef.child("images/$uuid")
+        val uploadTask = imageRef.putFile(uri)
+        uploadTask.addOnSuccessListener {
+            val result=it.metadata?.reference?.downloadUrl
+
+            result?.addOnSuccessListener(onSuccess)
+            inProgress.value=false
+
+        }
+            .addOnFailureListener{
+                handleException(it)
+            }
+
+    }
+
     fun createOrUpdateProfile(name: String? = null, number: String? = null, imageurl: String? = null) {
         val uid = auth.currentUser?.uid ?: return
         val updatedUserData = UserData(
@@ -131,6 +164,13 @@ class QTViewModel @Inject constructor(
 
         eventMutableState.value = Event(message)
         inProgress.value = false
+    }
+
+    fun logout() {
+        auth.signOut()
+        signIn.value=false
+        userData.value=null
+        eventMutableState.value=Event("Logged Out")
     }
 }
 

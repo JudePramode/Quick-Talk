@@ -35,7 +35,7 @@ import com.example.quicktalk.CheckSignedIn
 import com.example.quicktalk.DestinationScreen
 import com.example.quicktalk.QTViewModel
 import com.example.quicktalk.R
-import com.example.quicktalk.commonProgressBar
+import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.navigateTo
 
 @Composable
@@ -149,7 +149,7 @@ fun LoginScreen(navController: NavHostController, vm: QTViewModel)
         }
 
         if(vm.inProgress.value){
-            commonProgressBar()
+            CommonProgressBar()
         }
 
     }
