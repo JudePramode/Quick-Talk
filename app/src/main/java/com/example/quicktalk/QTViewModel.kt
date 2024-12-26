@@ -60,15 +60,17 @@ class QTViewModel @Inject constructor(
         ).addSnapshotListener{
             value,error->
             if (error!=null){
-                if (value!=null){
-                    chats.value=value.documents.mapNotNull {
-                        it.toObject<ChatData>()
-
-                    }
-                    inProgress.value=false
-                }
+                handleException(error)
 
             }
+            if (value!=null){
+                chats.value=value.documents.mapNotNull {
+                    it.toObject<ChatData>()
+
+                }
+                inProgress.value=false
+            }
+
         }
 
     }

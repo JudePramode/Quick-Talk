@@ -6,6 +6,7 @@ import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.layout.Box
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScopeInstance.weight
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,6 +63,7 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
                 }
             )
         },
+
         bottomBar = {
 
 
@@ -82,31 +84,20 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
             if (inProgress.value) {
                 CommonProgressBar() // Show a progress bar when loading
             } else {
-                // Your chat list content
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    // Example placeholder for chat list content
-                    TitleText(txt  ="Chats")
-                    Text(text = "Chat List Content", modifier = Modifier.padding(8.dp))
-                    LazyColumn ( modifier = Modifier.weight(1f)){
-                        items (chats){
+                LazyColumn ( modifier = Modifier.weight(1f)){
+                    items (chats){
                             chat->
-                            val chatUser=if (chat.user1.userId==userData.userId){
-                                chat.user2
-                            }else{
-                                chat.user1
+                        val chatUser=if (chat.user1.userId==userData.userId){
+                            chat.user2
+                        }else{
+                            chat.user1
+                        }
+                        CommonRow(imageUrl = chatUser.imageUrl, name =chatUser.name) {
+                            chat.chatId?.let{
+                                navigateTo(navController,DestinationScreen.SingleChat.createRoute(id=it))
+
+
                             }
-                            CommonRow(imageUrl = chatUser.imageUrl, name =chatUser.name) {
-                                chat.chatId?.let{
-                                    navigateTo(navController,DestinationScreen.SingleChat.createRoute(id=it))
-
-
-                                }
-                            }
-
                         }
 
                     }
