@@ -5,17 +5,23 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import com.example.quicktalk.data.CHATS
+import com.example.quicktalk.data.ChatData
+import com.example.quicktalk.data.ChatUser
 import com.example.quicktalk.data.Event
 import com.example.quicktalk.data.USER_NODE
 import com.example.quicktalk.data.UserData
 
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
+import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
@@ -30,9 +36,11 @@ class QTViewModel @Inject constructor(
 ) : ViewModel() {
 
     var inProgress = mutableStateOf(false)
+    var inProcessChats = mutableStateOf(false)
     val eventMutableState = mutableStateOf<Event<String>?>(null)
     var signIn = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
+    val chats = mutableStateOf<List<ChatData>>(listOf())
 
     init {
         val currentUser = auth.currentUser
@@ -40,6 +48,29 @@ class QTViewModel @Inject constructor(
         currentUser?.uid?.let {
             getUserData(it)
         }
+    }
+
+    fun populateChats(){
+        inProcessChats.value=true
+        db.collection(CHATS).where(
+            Filter.or(
+                Filter.equalTo("user1.userId",userData.value?.userId),
+                Filter.equalTo("user2.userId",userData.value?.userId),
+            )
+        ).addSnapshotListener{
+            value,error->
+            if (error!=null){
+                if (value!=null){
+                    chats.value=value.documents.mapNotNull {
+                        it.toObject<ChatData>()
+
+                    }
+                    inProgress.value=false
+                }
+
+            }
+        }
+
     }
 
     fun signUp(name: String, number: String, email: String, password: String) {
@@ -148,8 +179,10 @@ class QTViewModel @Inject constructor(
                 if (document != null) {
                     val user = document.toObject<UserData>()
                     userData.value = user
+                    inProgress.value = false
+                    populateChats()
                 }
-                inProgress.value = false
+
             }
             .addOnFailureListener { exception ->
                 handleException(exception, "Cannot retrieve User")
@@ -172,5 +205,54 @@ class QTViewModel @Inject constructor(
         userData.value=null
         eventMutableState.value=Event("Logged Out")
     }
+
+    fun onAddChat(number: String) {
+
+        if (number.isEmpty() or ! number.isDigitsOnly()){
+            handleException(customMessage = "Number must be contain digits only!")
+        }else{
+            db.collection(CHATS).where(Filter.or(
+
+                Filter.and(
+                    Filter.equalTo("user1.number",number),
+                    Filter.equalTo("user2.number",userData.value?.number)
+                ),
+                Filter.and(
+                    Filter.equalTo("user1.number",userData.value?.number),
+                    Filter.equalTo("user2.number",number)
+                )
+
+
+            )).get().addOnSuccessListener {
+                if (it.isEmpty){
+                    db.collection(USER_NODE).whereEqualTo("number",number).get().addOnSuccessListener {
+                        if (it.isEmpty){
+                            handleException(customMessage = "Number not found")
+                        }else{
+                            val chatPartner = it.toObjects<UserData>()[0]
+                            val id=db.collection(CHATS).document().id
+                            val chat = ChatData(
+                                chatId = id,
+                                ChatUser(userData.value?.userId, userData.value?.name,
+                                    userData.value?.imageUrl, userData.value?.number
+                                ),
+                                ChatUser(chatPartner.userId, chatPartner.name,chatPartner.imageUrl,chatPartner.number)
+                            )
+                            db.collection(CHATS).document(id).set(chat)
+                        }
+                    }
+                        .addOnFailureListener {
+                            handleException(it)
+                        }
+
+                }else{
+                    handleException(customMessage = "Chat already exists")
+                }
+            }
+        }
+
+    }
+
+
 }
 
