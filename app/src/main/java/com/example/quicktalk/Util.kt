@@ -69,16 +69,20 @@ fun CommonImage(data: String?, modifier: Modifier = Modifier.size(100.dp)) {
         Image(
             painter = rememberAsyncImagePainter(model = data),
             contentDescription = null,
+            contentScale = ContentScale.Crop, // Ensures the image fills the circle
             modifier = modifier
+
         )
     } else {
         Image(
-            painter = painterResource(id = R.drawable.profile), // Replace with a placeholder drawable
+            painter = painterResource(id = R.drawable.profile), // Placeholder
             contentDescription = "Placeholder Image",
+            contentScale = ContentScale.Crop, // Ensures the placeholder fills the circle
             modifier = modifier
         )
     }
 }
+
 
 
 

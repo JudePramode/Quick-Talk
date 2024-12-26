@@ -17,6 +17,7 @@ import com.example.quicktalk.Screens.ChatListScreen
 import com.example.quicktalk.Screens.LoginScreen
 import com.example.quicktalk.Screens.ProfileScreen
 import com.example.quicktalk.Screens.SignUpScreen
+import com.example.quicktalk.Screens.SingleChatScreen
 import com.example.quicktalk.Screens.StatusScreen
 import com.example.quicktalk.ui.theme.QuickTalkTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,10 +67,20 @@ class MainActivity : ComponentActivity() {
                 SignUpScreen(navController, viewModel)
             }
             composable(DestinationScreen.Login.route) {
-                LoginScreen(navController=navController, vm=viewModel)
+                LoginScreen(navController = navController, vm = viewModel)
             }
             composable(DestinationScreen.ChatList.route) {
                 ChatListScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.SingleChat.route) {
+                val chatId = it.arguments?.getString("chatId")
+                chatId?.let {
+                    SingleChatScreen(
+                        navController = navController,
+                        viewModel = viewModel,
+                        chatId = chatId
+                    )
+                }
             }
 
             composable(DestinationScreen.StatusList.route) {
@@ -79,7 +90,10 @@ class MainActivity : ComponentActivity() {
             composable(DestinationScreen.Profile.route) {
                 ProfileScreen(navController, viewModel)
             }
+
         }
     }
 }
+
+
 

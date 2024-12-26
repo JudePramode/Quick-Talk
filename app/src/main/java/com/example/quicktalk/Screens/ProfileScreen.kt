@@ -1,18 +1,15 @@
 package com.example.quicktalk.Screens
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -118,7 +116,10 @@ fun ProfileContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 25.dp).padding(8.dp).padding(start = 25.dp).padding(end = 25.dp),
+                .padding(top = 25.dp)
+                .padding(8.dp)
+                .padding(start = 25.dp)
+                .padding(end = 25.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Back", Modifier.clickable { onBack.invoke() })
@@ -134,7 +135,9 @@ fun ProfileContent(
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Name", modifier = Modifier.width(100.dp).padding(start = 20.dp))
+            Text(text = "Name", modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp))
             TextField(
                 value = name,
                 onValueChange = onNameChange,
@@ -144,7 +147,10 @@ fun ProfileContent(
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent
                 ),
-                modifier = Modifier.fillMaxWidth().padding(end = 30.dp).padding(top = 40.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 30.dp)
+                    .padding(top = 40.dp)
             )
         }
 
@@ -154,7 +160,9 @@ fun ProfileContent(
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Number", modifier = Modifier.width(100.dp).padding(start = 20.dp))
+            Text(text = "Number", modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp))
             TextField(
                 value = number,
                 onValueChange = onNumberChange,
@@ -164,7 +172,9 @@ fun ProfileContent(
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
                 ),
-                modifier = Modifier.fillMaxWidth().padding(end = 30.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 30.dp)
             )
         }
 
@@ -177,7 +187,8 @@ fun ProfileContent(
         ) {
             Text(
                 text = "LogOut",
-                modifier = Modifier.clickable { onLogout.invoke() }
+                modifier = Modifier.clickable { onLogout.invoke() } , Color.Red
+
             )
         }
     }
@@ -191,29 +202,38 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
         uri?.let { viewModel.uploadProfileImage(it) }
     }
 
-    Box {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-                .clickable { launcher.launch("image/*") },
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable { launcher.launch("image/*") }
         ) {
             Card(
                 shape = CircleShape,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(100.dp)
-            ) {
-                CommonImage(data = imageUrl)
-            }
-            Text(text = "Change Profile Picture")
+                    .size(120.dp)
+                    .padding(8.dp),
 
+            ) {
+                CommonImage(
+                    data = imageUrl,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            Text(
+                text = "Change Profile Picture",
+
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
+        // Show progress indicator while uploading
         if (viewModel.inProgress.value) {
             CommonProgressBar()
         }
     }
 }
-

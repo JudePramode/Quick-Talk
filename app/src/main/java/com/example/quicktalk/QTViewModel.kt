@@ -58,7 +58,7 @@ class QTViewModel @Inject constructor(
                 Filter.equalTo("user2.userId",userData.value?.userId),
             )
         ).addSnapshotListener{
-            value,error->
+                value,error->
             if (error!=null){
                 handleException(error)
 
@@ -191,6 +191,9 @@ class QTViewModel @Inject constructor(
             }
     }
 
+
+
+
     fun handleException(exception: Exception? = null, customMessage: String = "") {
         Log.e("QuickTalkApp", "Quick Talk Exception", exception)
         exception?.printStackTrace()
@@ -257,4 +260,3 @@ class QTViewModel @Inject constructor(
 
 
 }
-

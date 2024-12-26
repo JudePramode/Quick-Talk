@@ -1,31 +1,15 @@
 package com.example.quicktalk.Screens
 
-
-import android.icu.text.CaseMap
-import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.layout.Box
-
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScopeInstance.weight
-
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,38 +19,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.quicktalk.CommonImage
-import com.example.quicktalk.CommonProgressBar
-import com.example.quicktalk.CommonRow
-import com.example.quicktalk.DestinationScreen
-import com.example.quicktalk.QTViewModel
-import com.example.quicktalk.TitleText
-import com.example.quicktalk.navigateTo
-import com.google.ai.client.generativeai.type.content
+import com.example.quicktalk.*
 
 @Composable
 fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
-    val inProgress = viewModel.inProgress // Assuming `inProgress` is properly defined in QTViewModel
-    val showDialog = remember { mutableStateOf(false) } // Single showDialog state
+    val inProgress = viewModel.inProgress // Loading state
+    val chats = viewModel.chats // List of chats (State<List<ChatData>>)
+    val userData = viewModel.userData // Current user (State<UserData>)
+    val showDialog = remember { mutableStateOf(false) } // Show dialog state
 
     Scaffold(
-
         floatingActionButton = {
             FAB(
-
                 showDialog = showDialog.value,
                 onFabClick = { showDialog.value = true },
                 onDismiss = { showDialog.value = false },
                 onAddChat = { chatNumber ->
-                    viewModel.onAddChat(chatNumber) // Assuming `onAddChat` is defined in QTViewModel
+                    viewModel.onAddChat(chatNumber) // Add a new chat
                     showDialog.value = false
                 }
             )
         },
-
         bottomBar = {
-
-
             BottomNavigationMenu(
                 selectedItem = BottomNavigationItem.CHATLIST,
                 navController = navController
@@ -74,41 +48,37 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
         }
     ) { paddingValues ->
         Box(
-
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-        )
-
-        {
+        ) {
             if (inProgress.value) {
-                CommonProgressBar() // Show a progress bar when loading
+                CommonProgressBar() // Display progress bar while loading
             } else {
-                LazyColumn ( modifier = Modifier.weight(1f)){
-                    items (chats){
-                            chat->
-                        val chatUser=if (chat.user1.userId==userData.userId){
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(chats.value) { chat -> // Iterate through chat list
+                        val chatUser = if (chat.user1.userId == userData.value?.userId) {
                             chat.user2
-                        }else{
+                        } else {
                             chat.user1
                         }
-                        CommonRow(imageUrl = chatUser.imageUrl, name =chatUser.name) {
-                            chat.chatId?.let{
-                                navigateTo(navController,DestinationScreen.SingleChat.createRoute(id=it))
 
+                        CommonRow(
+                            imageUrl = chatUser.imageUrl,
+                            name = chatUser.name
+                        ) {
+                            val chatId = chat.chatId ?: return@CommonRow // Skip if chatId is null
+                            navigateTo(navController, DestinationScreen.SingleChat.createRoute(chatId))
 
-                            }
                         }
-
                     }
-
                 }
-            }
-
             }
         }
     }
-
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,7 +90,6 @@ fun FAB(
 ) {
     val addChatNumber = remember { mutableStateOf("") }
 
-    // Display the dialog if showDialog is true
     if (showDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -153,6 +122,10 @@ fun FAB(
         shape = CircleShape,
         modifier = Modifier.padding(16.dp)
     ) {
-        Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add Chat", tint = Color.White)
+        Icon(
+            imageVector = Icons.Rounded.Add,
+            contentDescription = "Add Chat",
+            tint = Color.White
+        )
     }
 }
