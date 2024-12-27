@@ -1,5 +1,7 @@
 package com.example.quicktalk.data
 
+import com.google.firebase.Timestamp
+
 data class UserData(
     var userId: String?="",
     var name: String?="",
@@ -31,4 +33,10 @@ data class ChatUser(
     val name: String?="",
     val imageUrl: String?="",
     val number: String?=""
+)
+
+data class Message (
+    var sendBy: String?="",
+    val message: String?="",
+    val timestamp:String?="",
 )

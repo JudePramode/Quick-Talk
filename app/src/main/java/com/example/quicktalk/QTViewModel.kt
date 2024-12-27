@@ -2,6 +2,7 @@ package com.example.quicktalk
 
 
 import android.net.Uri
+
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -12,8 +13,18 @@ import com.example.quicktalk.data.CHATS
 import com.example.quicktalk.data.ChatData
 import com.example.quicktalk.data.ChatUser
 import com.example.quicktalk.data.Event
+import com.example.quicktalk.data.MESSAGE
 import com.example.quicktalk.data.USER_NODE
 import com.example.quicktalk.data.UserData
+import com.example.quicktalk.data.Message
+
+
+
+
+
+
+
+
 
 
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +35,7 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
 
@@ -74,6 +86,21 @@ class QTViewModel @Inject constructor(
         }
 
     }
+
+
+
+    fun onSendReply(chatId:String, message: String){
+        val time = Calendar.getInstance().time.toString()
+        val msg = Message(userData.value?.userId, message, time)
+        db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(msg)
+
+    }
+
+
+
+
+
+
 
     fun signUp(name: String, number: String, email: String, password: String) {
         if (name.isEmpty() || number.isEmpty() || email.isEmpty() || password.isEmpty()) {
@@ -126,13 +153,19 @@ class QTViewModel @Inject constructor(
     }
 
     fun uploadProfileImage(uri: Uri) {
-        inProgress.value = true // Indicate progress in the UI
+        val storageRef = storage.reference
+        val imageRef = storageRef.child("images/${UUID.randomUUID()}")
 
-        uploadImage(uri) { downloadUri ->
-            createOrUpdateProfile(imageurl = downloadUri.toString())
-            inProgress.value = false // Reset progress state
+        imageRef.putFile(uri).addOnSuccessListener {
+            imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                Log.d("uploadProfileImage", "Image URL: $downloadUri")
+                createOrUpdateProfile(imageurl = downloadUri.toString())
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("uploadProfileImage", "Error uploading image", exception)
         }
     }
+
 
 
     fun uploadImage(uri: Uri, onSuccess:(Uri)->Unit){

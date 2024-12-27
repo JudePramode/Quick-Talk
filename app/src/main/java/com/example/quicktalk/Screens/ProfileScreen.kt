@@ -199,7 +199,13 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        uri?.let { viewModel.uploadProfileImage(it) }
+        if (uri != null) {
+            Log.d("ProfileImage", "Selected URI: $uri")
+            viewModel.uploadProfileImage(uri)
+        // Call the uploadProfileImage function here
+        } else {
+            Log.e("ProfileImage", "No image selected")
+        }
     }
 
     Box(
@@ -210,14 +216,13 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable { launcher.launch("image/*") }
+            modifier = Modifier.clickable { launcher.launch("image/*") } // Launch image picker
         ) {
             Card(
                 shape = CircleShape,
                 modifier = Modifier
                     .size(120.dp)
-                    .padding(8.dp),
-
+                    .padding(8.dp)
             ) {
                 CommonImage(
                     data = imageUrl,
@@ -226,12 +231,10 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
             }
             Text(
                 text = "Change Profile Picture",
-
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
 
-        // Show progress indicator while uploading
         if (viewModel.inProgress.value) {
             CommonProgressBar()
         }

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,23 +65,22 @@ fun CommonDivider() {
 }
 
 @Composable
-fun CommonImage(data: String?, modifier: Modifier = Modifier.size(100.dp)) {
-    if (!data.isNullOrEmpty()) {
-        Image(
-            painter = rememberAsyncImagePainter(model = data),
-            contentDescription = null,
-            contentScale = ContentScale.Crop, // Ensures the image fills the circle
-            modifier = modifier
-
-        )
-    } else {
-        Image(
-            painter = painterResource(id = R.drawable.profile), // Placeholder
-            contentDescription = "Placeholder Image",
-            contentScale = ContentScale.Crop, // Ensures the placeholder fills the circle
-            modifier = modifier
-        )
-    }
+fun CommonImage(
+    data: String?,
+    modifier: Modifier = Modifier.size(100.dp),
+    placeholder: Painter? = painterResource(id = R.drawable.profile),
+    error: Painter? = painterResource(id = R.drawable.profile)
+) {
+    Image(
+        painter = rememberAsyncImagePainter(
+            model = data,
+            placeholder = placeholder,
+            error = error,
+            contentScale = ContentScale.Crop // Ensures the image fills the circular shape
+        ),
+        contentDescription = null,
+        modifier = modifier
+    )
 }
 
 
@@ -107,7 +107,8 @@ fun TitleText (txt:String){
 @Composable
 fun CommonRow(imageUrl:String?,name:String?,onItemClick:()->Unit){
     Row (modifier = Modifier.fillMaxSize().height(80.dp).clickable { onItemClick.invoke() }, verticalAlignment = Alignment.CenterVertically){
-        CommonImage(data = imageUrl, modifier = Modifier.padding(8.dp).size(50.dp).clip(CircleShape).background(Color.Red))
+        CommonImage(data = imageUrl, modifier = Modifier.padding(8.dp).size(50.dp).clip(CircleShape).background(
+            Color.LightGray))
         Text(text = name?:"---",
             fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 5.dp))
     }
