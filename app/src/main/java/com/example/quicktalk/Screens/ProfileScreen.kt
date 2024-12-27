@@ -3,6 +3,7 @@ package com.example.quicktalk.Screens
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil3.compose.rememberAsyncImagePainter
 import com.example.quicktalk.CommonDivider
 import com.example.quicktalk.CommonImage
 import com.example.quicktalk.CommonProgressBar
@@ -126,6 +128,7 @@ fun ProfileContent(
             Text(text = "Save", Modifier.clickable { onSave.invoke() })
         }
         CommonDivider()
+
         ProfileImage(imageUrl = imageUrl, viewModel = viewModel)
         CommonDivider()
 
@@ -199,13 +202,7 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) {
-            Log.d("ProfileImage", "Selected URI: $uri")
-            viewModel.uploadProfileImage(uri)
-        // Call the uploadProfileImage function here
-        } else {
-            Log.e("ProfileImage", "No image selected")
-        }
+        uri?.let { viewModel.uploadProfileImage(it) }
     }
 
     Box(
@@ -216,18 +213,23 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable { launcher.launch("image/*") } // Launch image picker
+            modifier = Modifier.clickable { launcher.launch("image/*") }
         ) {
             Card(
                 shape = CircleShape,
                 modifier = Modifier
                     .size(120.dp)
-                    .padding(8.dp)
+                    .padding(8.dp),
             ) {
-                CommonImage(
-                    data = imageUrl,
-                    modifier = Modifier.fillMaxSize()
-                )
+                if (!imageUrl.isNullOrEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(text = "No Image")
+                }
             }
             Text(
                 text = "Change Profile Picture",
@@ -235,8 +237,10 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
             )
         }
 
+        // Show progress indicator while uploading
         if (viewModel.inProgress.value) {
             CommonProgressBar()
         }
     }
 }
+

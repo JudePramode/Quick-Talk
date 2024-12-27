@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import coil3.request.ImageRequest
 import com.example.quicktalk.data.CHATS
 import com.example.quicktalk.data.ChatData
 import com.example.quicktalk.data.ChatUser
@@ -30,6 +31,7 @@ import com.example.quicktalk.data.Message
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
@@ -53,6 +55,9 @@ class QTViewModel @Inject constructor(
     var signIn = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
     val chats = mutableStateOf<List<ChatData>>(listOf())
+    val chatMessages= mutableStateOf<List<Message>>(listOf())
+    val inProgressChatMessage = mutableStateOf(false)
+    var currentChatMessageListener: ListenerRegistration?=null
 
     init {
         val currentUser = auth.currentUser
@@ -61,6 +66,36 @@ class QTViewModel @Inject constructor(
             getUserData(it)
         }
     }
+
+    fun populateMessages(chatId:String){
+        inProgressChatMessage.value = true
+        currentChatMessageListener= db.collection(CHATS).document(chatId).collection(MESSAGE)
+            .addSnapshotListener{value,error->
+                if (error!=null){
+                    handleException(error)
+
+                }
+                if (value!=null){
+                    chatMessages.value = value.documents.mapNotNull {
+                        it.toObject<Message>()
+                    }.sortedBy { it.timestamp }
+                    inProgressChatMessage.value=false
+                }
+
+            }
+    }
+
+    fun depopulateMessage(){
+        chatMessages.value = listOf()
+        currentChatMessageListener = null
+
+
+
+    }
+
+
+
+
 
     fun populateChats(){
         inProcessChats.value=true
@@ -153,18 +188,28 @@ class QTViewModel @Inject constructor(
     }
 
     fun uploadProfileImage(uri: Uri) {
+        inProgress.value = true
         val storageRef = storage.reference
         val imageRef = storageRef.child("images/${UUID.randomUUID()}")
 
-        imageRef.putFile(uri).addOnSuccessListener {
-            imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                Log.d("uploadProfileImage", "Image URL: $downloadUri")
-                createOrUpdateProfile(imageurl = downloadUri.toString())
+        imageRef.putFile(uri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    Log.d("uploadProfileImage", "Image uploaded: $downloadUri")
+                    createOrUpdateProfile(imageurl = downloadUri.toString()) // Update user profile with URL
+                    inProgress.value = false
+                }.addOnFailureListener { exception ->
+                    Log.e("uploadProfileImage", "Error getting download URL", exception)
+                    inProgress.value = false
+                }
             }
-        }.addOnFailureListener { exception ->
-            Log.e("uploadProfileImage", "Error uploading image", exception)
-        }
+            .addOnFailureListener { exception ->
+                Log.e("uploadProfileImage", "Error uploading image", exception)
+                inProgress.value = false
+            }
     }
+
+
 
 
 
@@ -241,6 +286,8 @@ class QTViewModel @Inject constructor(
         auth.signOut()
         signIn.value=false
         userData.value=null
+        depopulateMessage()
+        currentChatMessageListener=null
         eventMutableState.value=Event("Logged Out")
     }
 
