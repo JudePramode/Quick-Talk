@@ -56,7 +56,7 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
                 CommonProgressBar() // Display progress bar while loading
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().padding(start = 25.dp).padding(end = 20.dp)
                 ) {
                     items(chats.value) { chat -> // Iterate through chat list
                         val chatUser = if (chat.user1.userId == userData.value?.userId) {
