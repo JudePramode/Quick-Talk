@@ -18,14 +18,7 @@ import com.example.quicktalk.data.MESSAGE
 import com.example.quicktalk.data.USER_NODE
 import com.example.quicktalk.data.UserData
 import com.example.quicktalk.data.Message
-
-
-
-
-
-
-
-
+import com.example.quicktalk.data.Status
 
 
 import com.google.firebase.auth.FirebaseAuth
@@ -58,6 +51,9 @@ class QTViewModel @Inject constructor(
     val chatMessages= mutableStateOf<List<Message>>(listOf())
     val inProgressChatMessage = mutableStateOf(false)
     var currentChatMessageListener: ListenerRegistration?=null
+
+    val status = mutableStateOf<List<Status>>(listOf())
+    val inProgressStatus = mutableStateOf(false)
 
     init {
         val currentUser = auth.currentUser
