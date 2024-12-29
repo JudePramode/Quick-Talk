@@ -1,6 +1,6 @@
-package com.example.quicktalk.Screens
-
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,13 +13,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.accompanist.swiperefresh.SwipeRefresh
 import androidx.navigation.NavHostController
 import com.example.quicktalk.*
+import com.example.quicktalk.Screens.BottomNavigationItem
+import com.example.quicktalk.Screens.BottomNavigationMenu
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
@@ -27,6 +34,8 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
     val chats = viewModel.chats // List of chats (State<List<ChatData>>)
     val userData = viewModel.userData // Current user (State<UserData>)
     val showDialog = remember { mutableStateOf(false) } // Show dialog state
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = inProgress.value)
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         floatingActionButton = {
@@ -47,31 +56,61 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
             )
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = {
+                coroutineScope.launch {
+                    viewModel.populateChats() // Refresh chat list
+                }
+            }
         ) {
-            if (inProgress.value) {
-                CommonProgressBar() // Display progress bar while loading
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(start = 25.dp).padding(end = 20.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(start = 15.dp)
+            ) {
+                // Add the Title
+                TitleText(txt = "Chats")
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
-                    items(chats.value) { chat -> // Iterate through chat list
-                        val chatUser = if (chat.user1.userId == userData.value?.userId) {
-                            chat.user2
-                        } else {
-                            chat.user1
-                        }
-
-                        CommonRow(
-                            imageUrl = chatUser.imageUrl,
-                            name = chatUser.name
+                    if (inProgress.value) {
+                        CommonProgressBar() // Display progress bar while loading
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 15.dp, end = 20.dp)
                         ) {
-                            val chatId = chat.chatId ?: return@CommonRow // Skip if chatId is null
-                            navigateTo(navController, DestinationScreen.SingleChat.createRoute(chatId))
+                            items(chats.value) { chat -> // Iterate through chat list
+                                val chatUser = if (chat.user1.userId == userData.value?.userId) {
+                                    chat.user2
+                                } else {
+                                    chat.user1
+                                }
 
+                                Box(
+                                    modifier = Modifier.pointerInput(Unit) {
+                                        detectHorizontalDragGestures { change, dragAmount ->
+                                            change.consume()
+                                            if (dragAmount < -50) { // Detect swipe to the left
+                                                viewModel.deleteChat(chat.chatId ?: return@detectHorizontalDragGestures)
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    CommonRow(
+                                        imageUrl = chatUser.imageUrl,
+                                        name = chatUser.name
+                                    ) {
+                                        val chatId = chat.chatId ?: return@CommonRow // Skip if chatId is null
+                                        navigateTo(navController, DestinationScreen.SingleChat.createRoute(chatId))
+                                    }
+                                }
+                            }
                         }
                     }
                 }

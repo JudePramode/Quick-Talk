@@ -1,11 +1,17 @@
 package com.example.quicktalk.Screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+
+
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
@@ -32,91 +38,91 @@ import com.google.ai.client.generativeai.type.content
 @Composable
 fun StatusScreen(navController: NavHostController, viewModel: QTViewModel) {
     val inProgress = viewModel.inProgressStatus.value
-    if (inProgress){
+    if (inProgress) {
         CommonProgressBar()
-    }else{
+    } else {
         val statuses = viewModel.status.value
         val userData = viewModel.userData.value
 
-        val myStatuses = statuses.filter {
-            it.user.userId ==userData?.userId
+        // Separate statuses
+        val myStatuses = statuses.filter { it.user.userId == userData?.userId }
+        val otherStatuses = statuses.filter { it.user.userId != userData?.userId }
+
+        // File picker for uploading status
+        val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+            uri?.let { viewModel.uploadStatus(it) }
         }
 
-        val otherStatuses = statuses.filter {
-            it.user.userId !=userData?.userId
-        }
-
-
-
-        Scaffold (
+        Scaffold(
             floatingActionButton = {
-                FAB {
-                {}
-            }
+                FAB { launcher.launch("image/*") }
             },
-                    content = {
-                        Column (modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it))
-                        {
-                            TitleText(txt= "Status")
-                            if (statuses.isEmpty()){
-                                Column (modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ){
-                                    Text(text = "No Statuses Available")
+            bottomBar = {
+                BottomNavigationMenu(
+                    selectedItem = BottomNavigationItem.STATUSLIST,
+                    navController = navController
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(start = 16.dp)
+            ) {
+                TitleText(txt = "Status")
 
-                                }
-                            }else{
-                                if (myStatuses.isNotEmpty()){
-                                    CommonRow(imageUrl = myStatuses[0].user.imageUrl, name = myStatuses[0].user.name
-
-
-                                    ) {
-                                        navigateTo(navController=navController,
-                                            DestinationScreen.SingleStatus.createRoute(myStatuses[0].user.userId!!)
-                                        )
-                                    }
-                                    CommonDivider()
-                                    val uniqueUsers = otherStatuses.map { it.user }.toSet().toSet()
-                                    LazyColumn (modifier = Modifier.weight(1f)){
-                                        items(uniqueUsers){ user->
-                                            CommonRow(imageUrl = user.imageUrl, name = user.name) {
-                                                navigateTo(
-                                                    navController=navController,
-                                                    DestinationScreen.SingleStatus.createRoute(user.userId!!)
-                                                )
-
-                                            }
-                                        }
-                                    }
-                                }
-
+                if (statuses.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(text = "No Statuses Available")
+                    }
+                } else {
+                    if (myStatuses.isNotEmpty()) {
+                        CommonRow(imageUrl = myStatuses[0].user.imageUrl, name = myStatuses[0].user.name) {
+                            myStatuses[0].user.userId?.let { userId ->
+                                navigateTo(navController, DestinationScreen.SingleStatus.createRoute(userId))
                             }
                         }
-
+                        CommonDivider()
+                    }
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+                        items(otherStatuses) { status ->
+                            CommonRow(imageUrl = status.user.imageUrl, name = status.user.name) {
+                                status.user.userId?.let { userId ->
+                                    navigateTo(navController, DestinationScreen.SingleStatus.createRoute(userId))
+                                }
+                            }
+                        }
+                    }
+                }
             }
-        )
-        BottomNavigationMenu(selectedItem = BottomNavigationItem.STATUSLIST,navController=navController)
-
-
-
+        }
+    }
 }
-}
+
+
 
 @Composable
 fun FAB(
-    onFabClick:()->Unit
-){
-    FloatingActionButton(onClick = onFabClick,
+    onFabClick: () -> Unit
+) {
+    FloatingActionButton(
+        onClick = onFabClick,
         containerColor = MaterialTheme.colorScheme.secondary,
         shape = CircleShape,
-        modifier = Modifier.padding(bottom = 40.dp)
+        modifier = Modifier.padding(16.dp)
     ) {
-        Icon(imageVector = Icons.Rounded.Edit, contentDescription = "Add Status", tint = Color.White)
-
+        Icon(
+            imageVector = Icons.Rounded.Edit,
+            contentDescription = "Add Status",
+            tint = Color.White
+        )
     }
 }
+

@@ -1,5 +1,6 @@
 package com.example.quicktalk
 
+import ChatListScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,11 +14,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.quicktalk.Screens.ChatListScreen
+
 import com.example.quicktalk.Screens.LoginScreen
 import com.example.quicktalk.Screens.ProfileScreen
 import com.example.quicktalk.Screens.SignUpScreen
 import com.example.quicktalk.Screens.SingleChatScreen
+import com.example.quicktalk.Screens.SingleStatusScreen
 import com.example.quicktalk.Screens.StatusScreen
 import com.example.quicktalk.ui.theme.QuickTalkTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,6 +85,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+
             composable(DestinationScreen.StatusList.route) {
                 StatusScreen(navController, viewModel)
             }
@@ -90,6 +93,16 @@ class MainActivity : ComponentActivity() {
             composable(DestinationScreen.Profile.route) {
                 ProfileScreen(navController, viewModel)
             }
+
+            composable (DestinationScreen.SingleStatus.route){
+                val userId = it.arguments?.getString("userId")
+                userId?.let {
+
+                    SingleStatusScreen(navController=navController, viewModel=viewModel, userId = it)
+
+                }
+            }
+
 
         }
     }

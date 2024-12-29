@@ -86,6 +86,11 @@ dependencies {
 
     implementation("io.coil-kt.coil3:coil-compose:3.0.4")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.30.1")
+    implementation ("com.google.accompanist:accompanist-permissions:0.24.7-alpha")
+
+
+
 
 
 }

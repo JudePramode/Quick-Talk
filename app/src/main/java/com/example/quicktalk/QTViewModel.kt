@@ -1,11 +1,15 @@
 package com.example.quicktalk
 
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
-
+import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -18,9 +22,8 @@ import com.example.quicktalk.data.MESSAGE
 import com.example.quicktalk.data.USER_NODE
 import com.example.quicktalk.data.UserData
 import com.example.quicktalk.data.Message
+import com.example.quicktalk.data.STATUS
 import com.example.quicktalk.data.Status
-
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
@@ -30,6 +33,9 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
@@ -51,9 +57,10 @@ class QTViewModel @Inject constructor(
     val chatMessages= mutableStateOf<List<Message>>(listOf())
     val inProgressChatMessage = mutableStateOf(false)
     var currentChatMessageListener: ListenerRegistration?=null
-
     val status = mutableStateOf<List<Status>>(listOf())
     val inProgressStatus = mutableStateOf(false)
+    var photoUri: Uri? = null
+
 
     init {
         val currentUser = auth.currentUser
@@ -85,15 +92,10 @@ class QTViewModel @Inject constructor(
         chatMessages.value = listOf()
         currentChatMessageListener = null
 
-
-
     }
 
 
-
-
-
-    fun populateChats(){
+ fun populateChats(){
         inProcessChats.value=true
         db.collection(CHATS).where(
             Filter.or(
@@ -162,6 +164,7 @@ class QTViewModel @Inject constructor(
             }
     }
 
+
     fun loginIn(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please fill all fields")
@@ -182,6 +185,7 @@ class QTViewModel @Inject constructor(
                 }
             }
     }
+
 
     fun uploadProfileImage(uri: Uri) {
         inProgress.value = true
@@ -204,8 +208,6 @@ class QTViewModel @Inject constructor(
                 inProgress.value = false
             }
     }
-
-
 
 
 
@@ -257,6 +259,7 @@ class QTViewModel @Inject constructor(
                     userData.value = user
                     inProgress.value = false
                     populateChats()
+                    populateStatuses()
                 }
 
             }
@@ -333,6 +336,127 @@ class QTViewModel @Inject constructor(
         }
 
     }
+
+    fun uploadStatus(uri: Uri) {
+            uploadImage(uri){
+                createStatus(it.toString())
+            }
+    }
+
+    fun createStatus(imageurl:String){
+        val newStatus=Status(
+           ChatUser(
+               userData.value?.userId,
+               userData.value?.name,
+               userData.value?.imageUrl,
+               userData.value?.number,
+           ) ,
+            imageurl,
+            System.currentTimeMillis()
+
+        )
+        db.collection(STATUS).document().set(newStatus)
+    }
+
+    fun populateStatuses() {
+        val timeDelta = 24L * 60 * 60 * 1000 // 24 hours in milliseconds
+        val cutoff = System.currentTimeMillis() - timeDelta
+
+        inProgressStatus.value = true
+
+        // Fetch all chats involving the current user
+        db.collection(CHATS)
+            .where(
+                Filter.or(
+                    Filter.equalTo("user1.userId", userData.value?.userId),
+                    Filter.equalTo("user2.userId", userData.value?.userId)
+                )
+            )
+            .get()
+            .addOnSuccessListener { chatSnapshot ->
+                val currentConnections = mutableSetOf(userData.value?.userId)
+                val chats = chatSnapshot.toObjects<ChatData>()
+                chats.forEach { chat ->
+                    currentConnections.add(chat.user1.userId)
+                    currentConnections.add(chat.user2.userId)
+                }
+
+                // Fetch statuses from users in currentConnections
+                db.collection(STATUS)
+                    .whereGreaterThan("timestamp", cutoff)
+                    .whereIn("user.userId", currentConnections.toList())
+                    .addSnapshotListener { statusSnapshot, error ->
+                        if (error != null) {
+                            handleException(error)
+                            inProgressStatus.value = false
+                            return@addSnapshotListener
+                        }
+
+                        statusSnapshot?.let {
+                            status.value = it.toObjects<Status>()
+                        }
+                        inProgressStatus.value = false
+                    }
+            }
+            .addOnFailureListener { error ->
+                handleException(error)
+                inProgressStatus.value = false
+            }
+    }
+
+    fun deleteChat(chatId: String) {
+        db.collection(CHATS).document(chatId).delete()
+            .addOnSuccessListener {
+                Log.d("QTViewModel", "Chat deleted: $chatId")
+            }
+            .addOnFailureListener { exception ->
+                handleException(exception, "Failed to delete chat")
+            }
+    }
+
+    fun launchCamera(context: Context): Intent? {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(context.packageManager) != null) {
+            val photoFile: File? = try {
+                File.createTempFile(
+                    "IMG_${System.currentTimeMillis()}_",
+                    ".jpg",
+                    context.cacheDir
+                )
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                null
+            }
+
+            photoFile?.let {
+                photoUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", it)
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+            }
+            return takePictureIntent
+        }
+        return null
+    }
+
+
+    fun saveBitmapToUri(bitmap: Bitmap): Uri? {
+        val context = QTApplication.instance.applicationContext
+        val tempFile = File(context.cacheDir, "${UUID.randomUUID()}.jpg")
+        return try {
+            val outputStream = FileOutputStream(tempFile)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                tempFile
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
 
 }

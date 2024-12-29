@@ -6,9 +6,22 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class QTApplication : Application(){
+
+    companion object {
+        lateinit var instance: QTApplication
+            private set
+    }
+
+
+
+
+
+
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
+        instance = this
+
     }
 
 }
