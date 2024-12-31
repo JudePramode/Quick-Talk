@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -25,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -35,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.quicktalk.CheckSignedIn
+import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.DestinationScreen
 import com.example.quicktalk.QTViewModel
 import com.example.quicktalk.R
-import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,10 +140,10 @@ fun SignUpScreen(navController: NavController, vm: QTViewModel)
             },
                 modifier = Modifier.padding(top = 40.dp).padding(8.dp).widthIn(250.dp,300.dp).heightIn(50.dp,60.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF730101), // Background color
-                    contentColor = Color.White,        // Text/icon color
-                    disabledContainerColor = Color.Gray, // Background color when disabled
-                    disabledContentColor = Color.LightGray,  // Text/icon color when disabled
+                    containerColor = Color(0xFF730101),
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.Gray,
+                    disabledContentColor = Color.LightGray,
 
 
                 )

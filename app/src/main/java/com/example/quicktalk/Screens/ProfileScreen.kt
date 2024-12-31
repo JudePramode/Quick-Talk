@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,10 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.rememberAsyncImagePainter
 import com.example.quicktalk.CommonDivider
-import com.example.quicktalk.CommonImage
 import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.DestinationScreen
 import com.example.quicktalk.QTViewModel
@@ -65,12 +59,12 @@ fun ProfileScreen(navController: NavHostController, viewModel: QTViewModel) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Scrollable content with padding for the bottom navigation bar
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 56.dp) // Reserve space for the bottom navigation bar
+                .padding(bottom = 56.dp)
         ) {
             ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
@@ -89,7 +83,7 @@ fun ProfileScreen(navController: NavHostController, viewModel: QTViewModel) {
             )
         }
 
-        // Bottom navigation bar anchored at the bottom of the screen
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -209,7 +203,7 @@ fun ProfileContent(
 
 @Composable
 fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
-    // Launchers for gallery and camera
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -220,7 +214,7 @@ fun ProfileImage(imageUrl: String?, viewModel: QTViewModel) {
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         bitmap?.let {
-            val uri = viewModel.saveBitmapToUri(bitmap) // Save bitmap to Uri and upload
+            val uri = viewModel.saveBitmapToUri(bitmap)
             uri?.let { viewModel.uploadProfileImage(it) }
         }
     }

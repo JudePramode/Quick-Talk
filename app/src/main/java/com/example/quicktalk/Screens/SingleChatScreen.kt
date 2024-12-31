@@ -3,8 +3,6 @@ package com.example.quicktalk.Screens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -38,18 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.quicktalk.CommonDivider
 import com.example.quicktalk.CommonImage
 import com.example.quicktalk.QTViewModel
 import com.example.quicktalk.R
 import com.example.quicktalk.data.Message
-import org.w3c.dom.Text
 
 @Composable
 fun SingleChatScreen(navController: NavController,viewModel: QTViewModel, chatId:String) {
@@ -187,7 +181,7 @@ fun ReplyBox(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.send), // Replace with your drawable resource name
+                    painter = painterResource(id = R.drawable.send),
                     contentDescription = "Send",
                     tint = Color.White
                 )

@@ -13,11 +13,13 @@
 
 
     <!-- Camera feature declaration -->
-    <!-- Declaring camera as optional -->
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
-    <!-- Optional: Include this if your app also uses the front camera -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+
+
+
+
 
     <application
         android:allowBackup="true"

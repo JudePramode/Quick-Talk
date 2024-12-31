@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -29,12 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
 import coil3.compose.rememberAsyncImagePainter
 
 fun navigateTo(navController: NavController, route: String) {
     navController.navigate(route) {
-        popUpTo(navController.graph.startDestinationId) // Clears back stack to the root
+        popUpTo(navController.graph.startDestinationId)
         launchSingleTop = true
     }
 }
@@ -76,7 +74,7 @@ fun CommonImage(
             model = data,
             placeholder = placeholder,
             error = error,
-            contentScale = ContentScale.Crop // Ensures the image fills the circular shape
+            contentScale = ContentScale.Crop
         ),
         contentDescription = null,
         modifier = modifier
@@ -94,7 +92,7 @@ fun CheckSignedIn(vm: QTViewModel, navController: NavController) {
     if (signIn && !alreadySignedIn.value) {
         alreadySignedIn.value = true
         navController.navigate(DestinationScreen.ChatList.route) {
-            popUpTo(navController.graph.startDestinationId) // Clears back stack
+            popUpTo(navController.graph.startDestinationId)
         }
     }
 }

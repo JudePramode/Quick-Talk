@@ -7,23 +7,20 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
-import coil3.request.ImageRequest
 import com.example.quicktalk.data.CHATS
 import com.example.quicktalk.data.ChatData
 import com.example.quicktalk.data.ChatUser
 import com.example.quicktalk.data.Event
 import com.example.quicktalk.data.MESSAGE
-import com.example.quicktalk.data.USER_NODE
-import com.example.quicktalk.data.UserData
 import com.example.quicktalk.data.Message
 import com.example.quicktalk.data.STATUS
 import com.example.quicktalk.data.Status
+import com.example.quicktalk.data.USER_NODE
+import com.example.quicktalk.data.UserData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
@@ -196,7 +193,7 @@ class QTViewModel @Inject constructor(
             .addOnSuccessListener {
                 imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                     Log.d("uploadProfileImage", "Image uploaded: $downloadUri")
-                    createOrUpdateProfile(imageurl = downloadUri.toString()) // Update user profile with URL
+                    createOrUpdateProfile(imageurl = downloadUri.toString())
                     inProgress.value = false
                 }.addOnFailureListener { exception ->
                     Log.e("uploadProfileImage", "Error getting download URL", exception)

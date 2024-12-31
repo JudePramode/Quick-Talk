@@ -1,7 +1,6 @@
 package com.example.quicktalk.Screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,10 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.quicktalk.CheckSignedIn
+import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.DestinationScreen
 import com.example.quicktalk.QTViewModel
 import com.example.quicktalk.R
-import com.example.quicktalk.CommonProgressBar
 import com.example.quicktalk.navigateTo
 
 @Composable
@@ -116,10 +115,10 @@ fun LoginScreen(navController: NavHostController, vm: QTViewModel)
                 },
                     modifier = Modifier.padding(top = 40.dp).padding(8.dp).widthIn(250.dp,300.dp).heightIn(50.dp,60.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF730101), // Background color
-                        contentColor = Color.White,        // Text/icon color
-                        disabledContainerColor = Color.Gray, // Background color when disabled
-                        disabledContentColor = Color.LightGray,  // Text/icon color when disabled
+                        containerColor = Color(0xFF730101),
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.LightGray,
 
 
                     )

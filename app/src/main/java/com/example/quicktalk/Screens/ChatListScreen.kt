@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
     val inProgress = viewModel.inProgress // Loading state
     val chats = viewModel.chats // List of chats (State<List<ChatData>>)
-    val userData = viewModel.userData // Current user (State<UserData>)
+    val userData = viewModel.userData // Current user
     val showDialog = remember { mutableStateOf(false) } // Show dialog state
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = inProgress.value)
     val coroutineScope = rememberCoroutineScope()
@@ -44,7 +44,7 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
                 onFabClick = { showDialog.value = true },
                 onDismiss = { showDialog.value = false },
                 onAddChat = { chatNumber ->
-                    viewModel.onAddChat(chatNumber) // Add a new chat
+                    viewModel.onAddChat(chatNumber)
                     showDialog.value = false
                 }
             )
@@ -60,7 +60,7 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
             state = swipeRefreshState,
             onRefresh = {
                 coroutineScope.launch {
-                    viewModel.populateChats() // Refresh chat list
+                    viewModel.populateChats()
                 }
             }
         ) {
@@ -78,14 +78,14 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
                         .fillMaxSize()
                 ) {
                     if (inProgress.value) {
-                        CommonProgressBar() // Display progress bar while loading
+                        CommonProgressBar()
                     } else {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(start = 15.dp, end = 20.dp)
                         ) {
-                            items(chats.value) { chat -> // Iterate through chat list
+                            items(chats.value) { chat ->
                                 val chatUser = if (chat.user1.userId == userData.value?.userId) {
                                     chat.user2
                                 } else {
@@ -106,7 +106,7 @@ fun ChatListScreen(navController: NavHostController, viewModel: QTViewModel) {
                                         imageUrl = chatUser.imageUrl,
                                         name = chatUser.name
                                     ) {
-                                        val chatId = chat.chatId ?: return@CommonRow // Skip if chatId is null
+                                        val chatId = chat.chatId ?: return@CommonRow
                                         navigateTo(navController, DestinationScreen.SingleChat.createRoute(chatId))
                                     }
                                 }
